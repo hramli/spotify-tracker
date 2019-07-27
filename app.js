@@ -66,13 +66,27 @@ app.get('/api/recent', (req, res) => {
 });
 
 app.get('/api/artist', (req, res) => {
+    console.log("Called /api/artist");
     let token_type = req.query.token_type;
     let access_token = req.query.access_token;
+    getTopArtists(token_type, access_token).then((body) => {
+        res.send(body);
+    }).catch(err => {
+        console.log("error");
+        res.status(err.status);
+        res.send("Internal Server Error");
+    });
 });
 
 app.get('/api/track', (req, res) => {
     let token_type = req.query.token_type;
     let access_token = req.query.access_token;
+    getTopTracks(token_type, access_token).then((body) => {
+        res.send(body);
+    }).catch(err => {
+        res.status(err.status);
+        res.send("Internal Server Error");
+    })
 });
 
 //returns JSON
@@ -145,7 +159,7 @@ function getGenres(token_type, access_token, artist_id){
     });
 }
 
-function getTopArtists(token_type, access_token, limit=20, time_range="medium_term", offset=0){
+function getTopArtists(token_type, access_token, limit=20, time_range="long_term", offset=0){
     return new Promise((resolve, reject) => {
         request.get(
             `https://api.spotify.com/v1/me/top/artists?limit=${limit}&offset=${offset}&time_range=${time_range}`,
@@ -163,7 +177,7 @@ function getTopArtists(token_type, access_token, limit=20, time_range="medium_te
     })
 }
 
-function getTopTracks(token_type, access_token, limit=20, offset=0, time_range="medium_term"){
+function getTopTracks(token_type, access_token, limit=20, offset=0, time_range="long_term"){
     return new Promise((resolve, reject) => {
         request.get(
             `https://api.spotify.com/v1/me/top/tracks?limit=${limit}&offset=${offset}&time_range=${time_range}`,
