@@ -1,0 +1,14 @@
+<div class="mt-2" style="text-align: center;" >
+    <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="time_range">
+        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(0)">
+            <input ngbButton type="radio" [value]="0"> 4 weeks
+        </label>
+        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(1)">
+            <input ngbButton type="radio" [value]="1"> 6 months
+        </label>
+        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(2)">
+            <input ngbButton type="radio" [value]="2"> Max
+        </label>
+    </div>
+    <div #chart></div>
+</div>
