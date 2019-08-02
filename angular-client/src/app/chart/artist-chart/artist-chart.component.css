@@ -21,3 +21,19 @@
 .img:hover{
     opacity: 0.2;
 }
+
+.list-group-item{
+    width: 500px;
+    margin: auto;
+    background-color: #272727;
+    border: 1px solid #343a40;
+}
+
+ul{
+    list-style: none;
+}
+
+.artist-detail{
+    text-align: right;
+    color: white;
+}
