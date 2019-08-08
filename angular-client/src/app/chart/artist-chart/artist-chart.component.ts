@@ -15,10 +15,12 @@ export class ArtistChartComponent implements OnInit {
 
   imageArray: Array<image>;
   topArtists: topartists;
-  data$: Observable<topartists>;
+  artistData$: Observable<topartists>;
+  trackData$: Observable<any>; //make a model of top tracks
 
   ngOnInit() {
-    this.data$ = this.dataSvc.getTopArtists();
+    this.artistData$ = this.dataSvc.getTopArtists();
+    this.trackData$ = this.dataSvc.getTopTracks();
 
     this.dataSvc.getTopTracks().subscribe(
       res => {

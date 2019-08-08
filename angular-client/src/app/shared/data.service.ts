@@ -19,7 +19,7 @@ export class DataService {
   public access_token: string;
   public queryString: string;
 
-  topArtists: BehaviorSubject<topartists>;
+  topArtists$: BehaviorSubject<topartists>;
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {
     this.route.queryParams.subscribe(
@@ -30,7 +30,7 @@ export class DataService {
 
         this.getTopArtists().subscribe(
           (res: topartists) => {
-            this.topArtists = new BehaviorSubject(res);
+            this.topArtists$ = new BehaviorSubject(res);
           }
         )
       }

@@ -1,7 +1,7 @@
 <div class="row" style="margin-top: 1em;">
     <div class="col-12 col-md-6">
         <ul class="list-group">
-            <li class="list-group-item"  *ngFor="let artist of (dataSvc.topArtists | async)?.items">
+            <li class="list-group-item"  *ngFor="let artist of (artistData$ | async)?.items">
                 <div >
                     <img class="img crop" src="{{artist.images[0].url}}" alt="artist.name">
                     <div style="float: right;">
@@ -12,14 +12,25 @@
                             </li>
                         </ul>
                     </div>
-                    <!-- <div class="float-right">
-                        adsf
-                    </div> -->
-                    <!-- <p style="float: right;">{{artist.name}}</p> -->
                 </div>
             </li>
         </ul>
     </div>
-    <div class="col-12 col-md-6">=
+    <div class="col-12 col-md-6">
+        <ul class="list-group">
+            <li class="list-group-item"  *ngFor="let track of (trackData$ | async)?.items">
+                <div >
+                    <img class="img crop" src="{{track.album.images[0].url}}" alt="track.album.name">
+                    <div style="float: right;">
+                        <ul>
+                            <li class="artist-detail">{{track.name}}</li>
+                            <li style="margin-top: 1em; float: right;">
+                                <span style="color: white;">- {{track.artists[0].name}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
 </div>
