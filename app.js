@@ -13,7 +13,7 @@ const client_secret = "94b073b328ff4770aecf615e7bc54686";
 const scope = "user-read-recently-played%20user-top-read";
 
 
-//redirect to authorization page, then redirect back to react page
+//redirect to authorization page, then redirect back to angular page
 app.get('/' , (req, res) => {
     res.redirect(`https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=${scope}`);
 });
@@ -43,7 +43,7 @@ app.get('/api', (req,res) => {
             var access_token = data.access_token;
             console.log(`token_type ${token_type}`);
             console.log(`access_token ${access_token}`);
-            res.redirect(`http://localhost:4200?token_type=${token_type}&access_token=${access_token}`);
+            res.redirect(`http://localhost:4500?token_type=${token_type}&access_token=${access_token}`);
             // var recent = getRecentlyPlayed(token_type, access_token);
             // recent.then((body) => {
             //     res.send(body.items[0].track.artists[0].name);
@@ -119,7 +119,7 @@ app.get('/api/genre', (req, res) => {
         genre = inverseSortObjectByValue(genre);
         res.send(genre);
     }).catch(err => {
-        console.log(err);
+        res.status(400).end();
     });
 });
 

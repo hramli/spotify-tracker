@@ -21,17 +21,6 @@ export class ArtistChartComponent implements OnInit {
   ngOnInit() {
     this.artistData$ = this.dataSvc.getTopArtists();
     this.trackData$ = this.dataSvc.getTopTracks();
-
-    this.dataSvc.getTopTracks().subscribe(
-      res => {
-        console.log(res);
-      }
-    )
-    this.dataSvc.getTopArtists().subscribe(
-      res => {
-        console.log(res);
-      }
-    )
   }
 
 }

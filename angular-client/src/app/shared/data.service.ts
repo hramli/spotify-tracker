@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { topartists } from './models/topartists';
-
+import { apiUrl } from './models/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +31,9 @@ export class DataService {
         this.getTopArtists().subscribe(
           (res: topartists) => {
             this.topArtists$ = new BehaviorSubject(res);
+          },
+          (err: HttpErrorResponse) => {
+            window.location.href = "http://localhost:3000";
           }
         )
       }
@@ -57,19 +60,34 @@ export class DataService {
       try{
         //allData[0] = short_term, allData[1] = medium_term, allData[2] = long_term
         let allData: Array<Array<Array<any>>> = [];
-        this.getTopGenres("short_term").subscribe(res => 
+        this.getTopGenres("short_term").subscribe(
+          res => 
           {
             allData[0] = res;
-            this.getTopGenres("medium_term").subscribe(res => 
+            this.getTopGenres("medium_term").subscribe(
+              res => 
               {
                 allData[1] = res;
-                this.getTopGenres("long_term").subscribe(res => 
+                this.getTopGenres("long_term").subscribe(
+                  res => 
                   {
                     allData[2] = res;
                     resolve(allData);
-                  });
-              });
-          });
+                  },
+                  (err: HttpErrorResponse) => {
+                    window.location.href = "http://localhost:3000";
+                  }
+                );
+              },
+              (err: HttpErrorResponse) => {
+                window.location.href = "http://localhost:3000";
+              }
+            );
+          },
+          (err: HttpErrorResponse) => {
+            window.location.href = "http://localhost:3000";
+          }
+        );
       }
       catch{
         reject({

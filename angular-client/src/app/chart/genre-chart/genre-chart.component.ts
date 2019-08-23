@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } fro
 import * as d3 from 'd3';
 import { DataService } from 'src/app/shared/data.service';
 import { Router } from '@angular/router';
+import { apiUrl } from 'src/app/shared/models/constants';
 
 @Component({
   selector: 'app-genre-chart',
@@ -39,7 +40,7 @@ export class GenreChartComponent implements OnInit {
       {
         console.log(res);
         if(res.status == 400)
-          this.router.navigate([this.dataSvc.baseUrl]);
+          console.log("HELLo")
 
         this.allData = res;
         this.data = res[this.time_range].slice(0,11);

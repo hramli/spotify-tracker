@@ -25,8 +25,8 @@
 .list-group-item{
     width: 500px;
     margin: auto;
-    background-color: #272727;
-    border: 1px solid #343a40;
+    background-color: rgba(52, 58, 64, 0.4);
+    border: 1px solid rgba(52, 58, 64, 0.4);
 }
 
 ul{
