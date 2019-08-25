@@ -26,7 +26,6 @@ export class ArtistChartComponent implements OnInit {
   filterLength(name: string){
     let strippedNameByDash = name.split('-');
     let strippedNameByParenthesis = name.split('(');
-    console.log(strippedNameByParenthesis);
     if(strippedNameByDash.length > 1)
     {
       let strippedNameDash = strippedNameByDash[0];
