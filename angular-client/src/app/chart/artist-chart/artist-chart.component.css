@@ -23,7 +23,7 @@
 }
 
 .list-group-item{
-    width: 500px;
+    width: 100%;
     margin: auto;
     background-color: rgba(52, 58, 64, 0.4);
     border: 1px solid rgba(52, 58, 64, 0.4);
@@ -36,4 +36,41 @@ ul{
 .artist-detail{
     text-align: right;
     color: white;
+}
+
+.list-group-item-wrapper{
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media(max-width: 450px) {
+    .badge{
+        display: none;
+    }
+
+    ul{
+        padding-left: 0;
+    }
+}
+
+@media(max-width: 600px){
+    .list-group-item{
+        min-width: none;
+    }
+
+    li{
+        font-size: 13px;
+    }
+}
+  
+@media (min-width: 600px) {
+    .list-group-item-wrapper {
+      max-width: 540px;
+    }
+
+    .list-group-item {
+        min-width: 450px;
+    }
 }

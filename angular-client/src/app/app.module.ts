@@ -9,6 +9,7 @@ import { ChartComponent } from './chart/chart.component';
 import { RouterModule } from '@angular/router';
 import { GenreChartComponent } from './chart/genre-chart/genre-chart.component';
 import { ArtistChartComponent } from './chart/artist-chart/artist-chart.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { ArtistChartComponent } from './chart/artist-chart/artist-chart.componen
     ArtistChartComponent
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     HttpClientModule,
     NgbModule,

@@ -20,6 +20,7 @@ export class DataService {
   public queryString: string;
 
   topArtists$: BehaviorSubject<topartists>;
+  updateGenres$: Subject<number> = new Subject<number>();
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {
     this.route.queryParams.subscribe(

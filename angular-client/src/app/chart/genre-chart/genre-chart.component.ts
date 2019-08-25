@@ -1,29 +1,47 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import * as d3 from 'd3';
 import { DataService } from 'src/app/shared/data.service';
 import { Router } from '@angular/router';
 import { apiUrl } from 'src/app/shared/models/constants';
+import { from, Subscription } from 'rxjs';
+import { color, entries, path } from 'd3';
 
 @Component({
   selector: 'app-genre-chart',
   templateUrl: './genre-chart.component.html',
-  styleUrls: ['./genre-chart.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./genre-chart.component.css']
 })
-export class GenreChartComponent implements OnInit {
-  @ViewChild('chart', {static: true})
-  chartElement: ElementRef;
-
+export class GenreChartComponent implements OnInit, OnDestroy {
   //0 = short, 1 = medium (default), 2 = long
   time_range: number; 
 
+  //global chart properties
+  allData: [][];
+  numItems = 10;
+
+  //lollipop chart properties
+  @ViewChild('lollipopChart', {static: true})
+  lollipopChartElement: ElementRef;
+
   x: d3.ScaleLinear<number, number>;
   y: d3.ScaleBand<string>;
-  data: any;
+  lollipopData: any;
   svg: d3.Selection<any, unknown, null, undefined>;
-  allData: any;
   yAxis: d3.Selection<any, unknown, null, undefined>;
   xAxis: d3.Selection<any, unknown, SVGElement, unknown>;
+  
+  //d3 donut chart properties
+  @ViewChild('donutChart', {static: true})
+  donutChartElement: ElementRef;
+
+  donutData: any;
+
+
+  //loading spinner
+  loadingChart = true;
+
+  //subscriptions
+  updateGenreSubscription: Subscription;
 
   constructor(private dataSvc: DataService,
               private router: Router) {
@@ -31,70 +49,198 @@ export class GenreChartComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.buildLollipopChart();
+    this.dataSvc.getAllTopGenres().then(
+      (res) => {
+        this.allData = res;
+        this.buildLollipopChart();
+        this.buildDonutChart();
+      }
+    ).finally(
+      () => {
+        this.loadingChart = false;
+      }
+    );
+
+    //set updateGenre subscription
+    this.updateGenreSubscription = this.dataSvc.updateGenres$.subscribe(
+      //update genre charts
+      (res: number) => {
+        this.updateLollipopChart(res);
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    if(this.updateGenreSubscription)
+      this.updateGenreSubscription.unsubscribe();
   }
 
   buildLollipopChart(){
-    this.dataSvc.getAllTopGenres().then(
-      (res) => 
-      {
-        console.log(res);
-        if(res.status == 400)
-          console.log("HELLo")
+    this.lollipopData = this.allData[this.time_range].slice(0,this.numItems);
 
-        this.allData = res;
-        this.data = res[this.time_range].slice(0,11);
+    let margin = {top: 10, right: 30, bottom:40, left:80};
+    let width = 350 - margin.left - margin.right;
+    let height = 500 - margin.top - margin.bottom;
 
-        let margin = {top: 10, right: 30, bottom:40, left:100};
-        let width = 460 - margin.left - margin.right;
-        let height = 500 - margin.top - margin.bottom;
-    
-        this.svg = d3.select(this.chartElement.nativeElement)
-          .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .style("display","block")
-          .style("margin","auto")
-          .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-          .style("color", "white");
-    
-        this.x = d3.scaleLinear()
-          .domain([0, Math.ceil(this.data[0][1] / 10) * 10 * 2])
-          .range([0, width]);
-        
-        this.xAxis = this.svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(this.x))
-          .selectAll("text")
-          .attr("transform", "translate(-10,0)rotate(-45)")
-          .style("text-anchor", "end")
-          .style("color", "white");
-    
-        this.y = d3.scaleBand()
-          .range([0, height])
-          .padding(1);
-        
-        this.yAxis = this.svg.append("g");
+    this.svg = d3.select(this.lollipopChartElement.nativeElement)
+      .append("svg")
+      .style("display","block")
+      .style("margin","auto")
+      .style("margin-top","1em")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", "0 0 450 500")
+      .classed("svg-content", true)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .style("color", "white");
 
-        this.updateLollipopChart(1);
-    });
+    this.x = d3.scaleLinear()
+      .range([0, width]);
+    
+    this.xAxis = this.svg.append("g")
+      .attr("transform", "translate(0," + height + ")");
+
+    this.y = d3.scaleBand()
+      .range([0, height])
+      .padding(1);
+    
+    this.yAxis = this.svg.append("g");
+
+    this.dataSvc.updateGenres$.next(1);
+    
+  }
+
+  buildDonutChart(){
+    let margin = 30;
+    let width = 350;
+    let height = 400;
+
+    let radius = (Math.min(width, height) / 2) - margin ;
+
+    let donutSvg = d3.select(this.donutChartElement.nativeElement)
+      .append("svg")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .append("g")
+      .attr("transform", "translate(" + width / 2 + "," +
+        height / 2 + ")");
+  
+    let data = {};
+    let domain = [];
+    let values; 
+    values = 
+    
+    this.donutData = this.allData[2].slice(0,this.numItems);
+    for(let i = 0; i < this.numItems; i++)
+    {
+      let item = this.donutData[i];
+      data[item[0]] = item[1];
+    }
+
+    let colorScheme: any = d3.scaleOrdinal(["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#006d2c", "#00441b", "#002910"])
+      .domain(domain);
+      // .range(values);
+      // .range(['#1ED761', '#1ac157', '#17ab4d', '#149443', '#117937' ,'#0e672f']);
+
+    let pie: any = d3.pie()
+      .value(function (d: any) {  return d.value });
+    
+    
+    let data_ready = pie(d3.entries(data)) //if d3.entries(this.donutData), .value(d) d = [key: 0, value: Array[2]]
+
+    let arc = d3.arc()
+      .innerRadius(90)
+      .outerRadius(radius);
+
+    let label = d3.arc()
+      .outerRadius(radius - 40)
+      .innerRadius(radius - 40);
+
+    let g = donutSvg
+      .selectAll('.arc')
+      .data(data_ready)
+      .enter();
+
+    //donut shadow 
+    let defs = donutSvg.append("defs");
+
+    let filter = defs.append("filter")
+        .attr("id", "dropshadow")
+  
+    filter.append("feGaussianBlur")
+        .attr("in", "SourceAlpha")
+        .attr("stdDeviation", 4)
+        .attr("result", "blur");
+    filter.append("feOffset")
+        .attr("in", "blur")
+        .attr("dx", 3)
+        .attr("dy", 3)
+        .attr("result", "offsetBlur");
+  
+    var feMerge = filter.append("feMerge");
+  
+    feMerge.append("feMergeNode")
+        .attr("in", "offsetBlur")
+    feMerge.append("feMergeNode")
+        .attr("in", "SourceGraphic");
+
+    //append paths
+    g.append('path')
+        .attr('d', arc)
+        .attr('filter', 'none')
+        .attr('fill',(d: any) => { return colorScheme(d.data.key) })
+        .style("opacity", 0.9)
+        .on('mouseover', function(d: any, index){
+          let paths: any = donutSvg.selectAll('path');
+          let hoveredPath: SVGPathElement = paths._groups[0][index];
+
+          //add shadow on hover
+          hoveredPath.setAttribute('style', 'filter: url(#dropshadow)');
+
+          //set genre text styles
+          text.style("visibility","visible")
+          .text(d.data.key);
+        })
+        .on('mouseleave', function(d, index){
+          text.style('visibility', 'hidden');
+          let paths: any = donutSvg.selectAll('path');
+          let hoveredPath: SVGPathElement = paths._groups[0][index];
+
+          //remove shadow on mouse leave
+          hoveredPath.setAttribute('style', 'filter: none;');
+          hoveredPath.setAttribute('style', 'opacity: 0.9;');
+        })
+
+    let text = donutSvg.append('text')
+      .style("fill","white")
+      .style("visibility","visible")
+      .style("text-anchor", "middle")
+      .style("font-size", "10px");
+  }
+  
+  //re-update charts
+  setLollipopChart(time_range: number){
+    this.dataSvc.updateGenres$.next(time_range);
   }
 
   updateLollipopChart(time_range){
 
-    this.data = this.allData[time_range].slice(0,11);
-    console.log(this.data);
+    this.lollipopData = this.allData[time_range].slice(0,this.numItems);
+    let maxDomainRange = Math.ceil(this.lollipopData[0][1] / 10) * 10;
 
-    let y = this.y.domain(this.data.map(function(d) { return d[0];}));
-    let x = this.x.domain([0, Math.ceil(this.data[0][1] / 10) * 10 * 2]);
+    let y = this.y.domain(this.lollipopData.map(function(d) { return d[0];}));
+    let x = this.x.domain([0, maxDomainRange]);
 
     this.yAxis.call(d3.axisLeft(this.y));
+    this.xAxis
+          .call(d3.axisBottom(this.x).ticks(maxDomainRange/5)) //ticks to set intervals in x-axis
+          .selectAll("text")
+          .attr("transform", "translate(-10,0)rotate(-45)")
+          .style("text-anchor", "end")
+          .style("color", "white");
 
     let lines = this.svg.selectAll<SVGLineElement,any>(".myline")
-      .data(this.data);
-
-    // lines.exit().remove();
+      .data(this.lollipopData);
 
     lines
       .enter()
@@ -110,9 +256,7 @@ export class GenreChartComponent implements OnInit {
         .attr("stroke", "white");
 
     let circles = this.svg.selectAll<SVGCircleElement, any>("circle")
-      .data(this.data);
-
-    // circles.exit().remove();
+      .data(this.lollipopData);
 
     circles
       .enter()
@@ -138,8 +282,6 @@ export class GenreChartComponent implements OnInit {
         
       //on mouseover, attr callback function(d) return x(d) gives undefined error
 
-    // circles.exit().remove();
-
       var tooltip = this.svg
           .append("rect")
           .attr("width", 30)
@@ -153,15 +295,6 @@ export class GenreChartComponent implements OnInit {
           .style("visibility","hidden")
           .style("font-size", "10px");
       
-      // this.svg.selectAll("circle")
-      //   .transition()
-      //   .duration(2000)
-      //   .attr("cx", function(d) { return x(d[1]);})
-
-      // this.svg.selectAll("line")
-      //   .transition()
-      //   .duration(2000)
-      //   .attr("x1", function(d) { return x(d[1]);})
       }
 
  

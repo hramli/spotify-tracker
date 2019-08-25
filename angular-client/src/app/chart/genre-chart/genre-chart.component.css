@@ -1,0 +1,19 @@
+.card{
+    background-color: rgba(52, 58, 64, 0.4);
+}
+
+.card-body{
+    color: white;
+}
+
+@media (max-width: 991px){
+    .second-column{
+        margin-top: 2em;
+    }
+}
+.svg-container {
+    display: block;
+    position: relative;
+    width: 80%;
+    margin: auto;
+}

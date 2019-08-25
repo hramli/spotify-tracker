@@ -1,12 +1,13 @@
 <div class="row" style="margin-top: 1em;">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-6 mb-3">
         <ul class="list-group">
+            <li class="list-group-item card-header">Top Artists</li>
             <li class="list-group-item"  *ngFor="let artist of (artistData$ | async)?.items">
                 <div >
                     <img class="img crop" src="{{artist.images[0].url}}" alt="artist.name">
                     <div style="float: right;">
                         <ul>
-                            <li class="artist-detail">{{artist.name}}</li>
+                            <li class="artist-detail">{{filterLength(artist.name)}}</li>
                             <li style="margin-top: 1em; float: right;">
                                 <span *ngFor="let genre of artist.genres.slice(0,2);" class="badge badge-pill badge-light" style="padding: 3px; margin-left: 1em; font-weight: 100;">{{genre}}</span>
                             </li>
@@ -16,16 +17,17 @@
             </li>
         </ul>
     </div>
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-6 mb-3">
         <ul class="list-group">
+                <li class="list-group-item card-header">Top Songs</li>
             <li class="list-group-item"  *ngFor="let track of (trackData$ | async)?.items">
                 <div >
                     <img class="img crop" src="{{track.album.images[0].url}}" alt="track.album.name">
                     <div style="float: right;">
                         <ul>
-                            <li class="artist-detail">{{track.name}}</li>
+                            <li class="artist-detail">{{filterLength(track.name)}}</li>
                             <li style="margin-top: 1em; float: right;">
-                                <span style="color: white;">- {{track.artists[0].name}}</span>
+                                <span style="color: white;">- {{filterLength(track.artists[0].name)}}</span>
                             </li>
                         </ul>
                     </div>

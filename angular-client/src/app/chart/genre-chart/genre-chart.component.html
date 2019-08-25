@@ -1,14 +1,36 @@
-<div class="mt-2" style="text-align: center;" >
-    <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="time_range">
-        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(0)">
-            <input ngbButton type="radio" [value]="0"> 4 weeks
-        </label>
-        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(1)">
-            <input ngbButton type="radio" [value]="1"> 6 months
-        </label>
-        <label ngbButtonLabel class="btn-dark btn-sm" (click)="updateLollipopChart(2)">
-            <input ngbButton type="radio" [value]="2"> Max
-        </label>
+<div class="card">
+    <div class="card-header">
+        Top Genres
     </div>
-    <div #chart></div>
+    <div class="card-body">
+        <div class="loading-spinner text-center" *ngIf="loadingChart">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+        </div>
+        <div class="row mt-2">
+            <div class="col-lg-6">
+                <div class="" style="text-align: center;" >
+                    <div class="btn-group btn-group-toggle" ngbRadioGroup name="radioBasic" [(ngModel)]="time_range" *ngIf="!loadingChart">
+                        <label ngbButtonLabel class="btn-dark btn-sm" (click)="setLollipopChart(0)">
+                            <input ngbButton type="radio" [value]="0"> 4 weeks
+                        </label>
+                        <label ngbButtonLabel class="btn-dark btn-sm" (click)="setLollipopChart(1)">
+                            <input ngbButton type="radio" [value]="1"> 6 months
+                        </label>
+                        <label ngbButtonLabel class="btn-dark btn-sm" (click)="setLollipopChart(2)">
+                            <input ngbButton type="radio" [value]="2"> Max
+                        </label>
+                    </div>
+                    <div class="svg-container">
+                        <div #lollipopChart></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center second-column">
+                <p class="m-0" *ngIf="!loadingChart">All-time</p>
+                <div class="svg-container">
+                    <div #donutChart></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

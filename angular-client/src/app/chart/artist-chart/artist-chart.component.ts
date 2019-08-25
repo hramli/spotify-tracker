@@ -23,4 +23,23 @@ export class ArtistChartComponent implements OnInit {
     this.trackData$ = this.dataSvc.getTopTracks();
   }
 
+  filterLength(name: string){
+    let strippedNameByDash = name.split('-');
+    let strippedNameByParenthesis = name.split('(');
+    console.log(strippedNameByParenthesis);
+    if(strippedNameByDash.length > 1)
+    {
+      let strippedNameDash = strippedNameByDash[0];
+      if(strippedNameByParenthesis.length > 1)
+      {
+        let strippedNameParenthesis = strippedNameByParenthesis[0];
+        if(strippedNameDash.length < strippedNameParenthesis.length)
+          return strippedNameByDash;
+        return strippedNameParenthesis;
+      }
+      return name.split('-')[0];
+    }
+    return strippedNameByParenthesis[0];
+  }
+  
 }
