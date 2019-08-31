@@ -1,3 +1,3 @@
 # spotify-tracker
 
-![Demo usage](./screenshot.jpg?raw=true "Title")
+![Demo usage](./screenshot.png?raw=true "Title")
