@@ -1,7 +1,7 @@
 # spotify-tracker
 
-##About
+## About
 Libraries/Frameworks: Angular, Express, Node.js, and d3.js
 
-##Screenshot
+## Screenshot
 ![Demo usage](./screenshot.png?raw=true "Title")
