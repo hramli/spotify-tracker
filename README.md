@@ -1,5 +1,3 @@
-# spotify-tracker
-
 ## About
 Libraries/Frameworks: Angular, Express, Node.js, and d3.js
 
